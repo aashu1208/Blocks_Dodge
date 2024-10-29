@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
-
+using UnityEngine.UI;
+using TMPro;
 public class GameManager : MonoBehaviour {
 
     public int score;
@@ -12,6 +13,7 @@ public class GameManager : MonoBehaviour {
     public GameObject Block;
 
     public float SlowMotionTime;
+    public TextMeshProUGUI scoreText;
 
           
     void Start()
@@ -19,7 +21,9 @@ public class GameManager : MonoBehaviour {
         score = 0;
         numberOfBlockDestroyed = 0;
         Block.GetComponent<Transform>();
-        GameObject.Find("ScoreHUD").GetComponent<TextMesh>().text = score.ToString();
+        //GameObject.Find("ScoreHUD").GetComponent<TextMesh>().text = score.ToString();
+
+        scoreText.text = score.ToString();
     }
 
 	public void EndGame()
@@ -50,7 +54,8 @@ public class GameManager : MonoBehaviour {
         {
             numberOfBlockDestroyed = 0;
             score += 1;
-            GameObject.Find("ScoreHUD").GetComponent<TextMesh>().text = score.ToString();
+            //GameObject.Find("ScoreHUD").GetComponent<TextMesh>().text = score.ToString();
+            scoreText.text = score.ToString();
         }
     }
 

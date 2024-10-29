@@ -4,7 +4,7 @@ public class CameraAspect : MonoBehaviour
 {
 	void Start () 
 	{
-		Camera.main.aspect = 16/10f;
+		Camera.main.aspect = 9/16f;
 		Screen.sleepTimeout = SleepTimeout.NeverSleep;
         Time.timeScale = 1;
 	}

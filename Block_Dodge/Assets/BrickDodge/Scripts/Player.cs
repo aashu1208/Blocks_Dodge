@@ -4,11 +4,29 @@ public class Player : MonoBehaviour
 {
     public float mapwidth;
     public bool gameover;
-    public float moveSpeed = 10f; // Speed at which the player moves
+    public float moveSpeed = 10f; // Base speed
+    public float speedIncreaseRate = 0.1f; // Speed increase per second
+    private float currentSpeedMultiplier = 1f;
 
     void Start()
     {
         gameover = false;
+    }
+
+    void FixedUpdate()
+    {
+        if (!gameover)
+        {
+            currentSpeedMultiplier += speedIncreaseRate * Time.deltaTime;
+
+#if UNITY_EDITOR || UNITY_STANDALONE
+            MouseInput(); // Handle mouse input for testing in the editor
+#endif
+
+#if UNITY_ANDROID || UNITY_IOS
+            TouchInput(); // Call touch input for both Android and iOS
+#endif
+        }
     }
 
     private void TouchInput()
@@ -16,80 +34,27 @@ public class Player : MonoBehaviour
         if (Input.touchCount > 0 && !gameover)
         {
             Touch touch = Input.GetTouch(0);
-
-            // Detect if the touch is on the left or right side of the screen
             if (touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved)
             {
-                // Check if the touch is on the left half or right half of the screen
-                if (touch.position.x < Screen.width / 2)
-                {
-                    // Touch is on the left side, move the player left
-                    MoveLeft();
-                }
-                else if (touch.position.x > Screen.width / 2)
-                {
-                    // Touch is on the right side, move the player right
-                    MoveRight();
-                }
+                if (touch.position.x < Screen.width / 2) MoveLeft();
+                else if (touch.position.x > Screen.width / 2) MoveRight();
             }
         }
     }
 
     private void MouseInput()
     {
-        if (Input.GetMouseButton(0) && !gameover) // Left mouse button
+        if (Input.GetMouseButton(0) && !gameover)
         {
-            // Get the mouse position and convert it to world coordinates
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
-
-            // Only consider the X-axis for player movement
-            float targetX = mousePosition.x;
-
-            // Clamp the target position within map bounds
-            targetX = Mathf.Clamp(targetX, -mapwidth, mapwidth);
-
-            // Move the player smoothly to the target position
+            float targetX = Mathf.Clamp(mousePosition.x, -mapwidth, mapwidth);
             Vector3 newPosition = new Vector3(targetX, transform.position.y, transform.position.z);
-            transform.position = Vector3.Lerp(transform.position, newPosition, moveSpeed * Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, newPosition, moveSpeed * currentSpeedMultiplier * Time.deltaTime);
         }
     }
 
-    private void MoveLeft()
-    {
-        // Move the player left
-        if (transform.position.x > -mapwidth)
-        {
-            transform.Translate(-moveSpeed * Time.deltaTime, 0, 0);
-        }
-    }
-
-    private void MoveRight()
-    {
-        // Move the player right
-        if (transform.position.x < mapwidth)
-        {
-            transform.Translate(moveSpeed * Time.deltaTime, 0, 0);
-        }
-    }
-
-    void FixedUpdate()
-    {
-        // Unity Editor or standalone desktop platforms input
-#if UNITY_EDITOR || UNITY_STANDALONE
-        if (!gameover)
-        {
-            MouseInput(); // Handle mouse input for testing in the editor
-        }
-#endif
-
-        // Mobile input (Android & iOS)
-#if UNITY_ANDROID || UNITY_IOS
-        if (!gameover)
-        {
-            TouchInput(); // Call touch input for both Android and iOS
-        }
-#endif
-    }
+    private void MoveLeft() { if (transform.position.x > -mapwidth) transform.Translate(-moveSpeed * currentSpeedMultiplier * Time.deltaTime, 0, 0); }
+    private void MoveRight() { if (transform.position.x < mapwidth) transform.Translate(moveSpeed * currentSpeedMultiplier * Time.deltaTime, 0, 0); }
 
     void OnCollisionEnter2D()
     {
