@@ -18,7 +18,7 @@ public class MenuManager : MonoBehaviour {
             
             if (!hitInfo)
             {
-                SceneManager.LoadScene("Game"); 
+                SceneManager.LoadScene("Game1"); 
             }
         }
     }
